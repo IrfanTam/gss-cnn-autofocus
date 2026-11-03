@@ -1,0 +1,12 @@
+# FOV yang dikonfirmasi anomali (kurva Brenner tidak wajar / capture terhenti)
+# Format: <dataset>/<fov_id>  -- reason
+Dataset_100FOV_101img/44  -- multi_peak
+Dataset_100FOV_101img/45  -- multi_peak
+Dataset_100FOV_101img/50  -- multi_peak
+Dataset_49FOV_90img/16  -- peak_at_edge
+Dataset_49FOV_90img/25  -- multi_peak,flat_or_noisy
+Dataset_49FOV_90img/44  -- multi_peak
+Dataset_99FOV_120img/12  -- multi_peak
+Dataset_99FOV_120img/55  -- multi_peak,peak_at_edge
+Dataset_93FOV_101img_1incomplete/Lapang_Pandang_11  -- multi_peak
+Dataset_93FOV_101img_1incomplete/Lapang_Pandang_14  -- flat_or_noisy,peak_at_edge

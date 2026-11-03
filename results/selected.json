@@ -1,0 +1,10 @@
+{
+  "selected_backbone": "vit_tiny",
+  "p_min": 0.6,
+  "slack_fov": 1,
+  "gss_only_val_success": 62,
+  "n_val_fov": 63,
+  "n_test_fov": 71,
+  "raw_to_deg": 0.2932551319648094,
+  "unit_assumption_verified": false
+}
