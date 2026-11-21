@@ -1,0 +1,6 @@
+model,success,n,gss_only_wins,model_wins,loss_pp,boot_lo,boot_hi,newcombe_lo,newcombe_hi
+vit_tiny,65,71,6,0,8.5,2.8,15.5,1.6,17.2
+focusnet_nano,69,71,2,0,2.8,0.0,7.0,-2.7,9.7
+focusnet_micro,69,71,2,0,2.8,0.0,7.0,-2.7,9.7
+yolo26n,68,71,3,0,4.2,0.0,9.9,-1.6,11.7
+swin_tiny,68,71,3,0,4.2,0.0,9.9,-1.6,11.7

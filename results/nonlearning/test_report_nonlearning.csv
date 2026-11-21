@@ -1,0 +1,3 @@
+rule,eps_val_selected,meets_val_constraint,val_success,val_mean_steps,test_success,test_mean_steps,est_time_s,steps_saved_pct,gss_only_only_correct,rule_only_correct,mcnemar_exact_p,mean_error_deg,stop_on_sharpness
+plateau,0.002,True,62,10.78,71,10.73,6.98,16.0,0,0,1.0,0.07,71
+gain,0.05,False,46,6.08,52,6.24,4.06,51.2,19,0,0.0,1.07,71

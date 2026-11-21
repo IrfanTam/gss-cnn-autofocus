@@ -103,6 +103,8 @@ def simulate_hill_climbing(curve: FOVCurve, delta=1.0) -> SimResult:
             idx = next_idx
             steps += 1
         else:
+            if next_idx is not None:
+                steps += 1  # R1-1: the frame at idx+1 was captured to reject the move
             break
 
     result = SimResult(
@@ -142,6 +144,8 @@ def simulate_gss_only(curve: FOVCurve, theta_min=1.0, delta=1.0) -> SimResult:
             fd = curve.brenner_at(d)
         steps += 1
 
+    # Step convention (R1-1): the returned midpoint was never captured, so reaching it is one more step.
+    steps += 1
     final_pos = curve.positions[curve.nearest_index((a + b) / 2)]
     result = SimResult(
         strategy="gss_only", dataset=curve.dataset, fov_id=curve.fov_id,
@@ -212,6 +216,8 @@ def simulate_gss_cnn(curve: FOVCurve, cnn_predict_fn, theta_min=1.0, p_min=0.86,
             )
             return evaluate_success(result, delta)
 
+    # Step convention (R1-1): the returned midpoint was never captured, so reaching it is one more step.
+    steps += 1
     final_pos = curve.positions[curve.nearest_index((a + b) / 2)]
     result = SimResult(
         strategy="gss_cnn", dataset=curve.dataset, fov_id=curve.fov_id,

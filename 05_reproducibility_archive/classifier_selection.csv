@@ -1,0 +1,16 @@
+model,p_min_val_selected,meets_val_constraint,selected_backbone,test_success_pct,test_mean_steps,checkpoint
+efficientnet_b1,0.7,True,False,90.141,4.831,02_backbone_training/output/efficientnet_b1_balanced/efficientnet_b1_best.pt
+resnet18,0.9,False,False,87.324,4.873,02_backbone_training/output/resnet18_balanced/resnet18_best.pt
+mobilenetv3_small,0.5,True,False,87.324,5.028,02_backbone_training/output/mobilenetv3_small_balanced/mobilenetv3_small_best.pt
+resnet34,0.9,True,False,91.549,5.099,02_backbone_training/output/resnet34_balanced/resnet34_best.pt
+vit_tiny,0.6,True,True,91.549,5.225,02_backbone_training/output/vit_tiny_balanced/vit_tiny_best.pt
+yolo26n,0.5,True,False,95.775,5.268,02_backbone_training/output/yolo26n_balanced/weights/best.pt
+densenet121,0.8,True,False,91.549,5.282,02_backbone_training/output/densenet121_balanced/densenet121_best.pt
+regnety_400mf,0.9,True,False,94.366,5.352,02_backbone_training/output/regnety_400mf_balanced/regnety_400mf_best.pt
+mobilenetv3_large,0.99,False,False,94.366,5.521,02_backbone_training/output/mobilenetv3_large_balanced/mobilenetv3_large_best.pt
+efficientnet_b0,0.95,False,False,91.549,5.535,02_backbone_training/output/efficientnet_b0_balanced/efficientnet_b0_best.pt
+convnext_tiny,0.8,True,False,94.366,5.563,02_backbone_training/output/convnext_tiny_balanced/convnext_tiny_best.pt
+swin_tiny,0.8,True,False,95.775,5.634,02_backbone_training/output/swin_tiny_balanced/swin_tiny_best.pt
+shufflenet_v2,0.9,True,False,92.958,5.662,02_backbone_training/output/shufflenet_v2_balanced/shufflenet_v2_best.pt
+focusnet_nano,0.6,True,False,97.183,7.549,02_backbone_training/output/focusnet_nano_balanced/focusnet_nano_best.pt
+focusnet_micro,0.86,True,False,97.183,8.423,02_backbone_training/output/focusnet_micro_balanced/focusnet_micro_best.pt

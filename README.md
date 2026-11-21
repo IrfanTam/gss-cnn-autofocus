@@ -1,9 +1,12 @@
-# GSS + classifier early termination for microscope autofocus — code
+# GSS-CNN autofocus: code and result archive
 
-Code used for the experiments in the manuscript "Learning When to Stop: Classifier-Assisted
-Early Termination of Golden Section Search for Robotic Microscope Autofocus".
+Code and result archive for the manuscript "A Hybrid GSS-CNN Pipeline for Efficient Autofocus in Robotic Bright-Field Microscopy" (International Journal of Intelligent Engineering and Systems, Paper ID 20267653, revised version).
 
-Tested with Python 3.13.9, NVIDIA GeForce RTX 3050 (4 GB), PyTorch 2.9.1+cu126.
+The study is a replay study: classifier-assisted golden section search (GSS) is evaluated on recorded focus stacks of 71 held-out fields of view (FOV). No live instrument run is included.
+
+Immutable revision of this release: tag `v1.0-ijies-revision` (commit hash: see the GitHub release page).
+
+Tested with Python 3.13.9, PyTorch 2.9.1 (CUDA 12.6), torchvision 0.24.1, timm 1.0.26, Ultralytics 8.4.161, scikit-learn 1.7.2, on an NVIDIA GeForce RTX 3050 (4 GB).
 
 ## Setup
     python -m venv .venv && .venv\Scripts\activate          (Windows)
@@ -11,35 +14,28 @@ Tested with Python 3.13.9, NVIDIA GeForce RTX 3050 (4 GB), PyTorch 2.9.1+cu126.
     pip install -r requirements.txt
 
 ## Paths to edit first
-The scripts were written on the authors' PC. Before running, edit these constants:
-- `01_data_preparation/data_preparation.py`: `DATASET_MASTER` (folder with the five capture
-  sessions) and `EXCLUDED_FOV_PATH` (use `01_data_preparation/excluded_fov.txt`).
-- `03_pipeline_validation/*.py`: check the `DATA_PATH` / `CHECKPOINT_DIR` constants at the top.
+The scripts were written on the authors' PC. Edit the path constants at the top of `01_data_preparation/data_preparation.py` (`DATASET_MASTER`, `EXCLUDED_FOV_PATH`, use `01_data_preparation/excluded_fov.txt`), of `03_pipeline_validation/*.py`, of `04_supporting_analysis/*.py` and of `05_reproducibility_archive/make_archive.py`.
+
+## Folders
+- `01_data_preparation`: labelling, FOV-level split, class balancing; list of the 10 excluded FOV.
+- `02_backbone_training`: the 14 networks of the common training script, the two FocusNet variants, YOLO26n-cls arguments.
+- `03_pipeline_validation`: replay simulator (`gss_simulator.py`), classifier prediction caches, validation-based selection, unit-consistent replay with baselines and paired statistics, p_min sweep, retained sharpness, non-learning stopping rules, replay on training FOV.
+- `04_supporting_analysis`: paired confidence intervals, Spearman permutation test, triggering-frame labels, unimodality check, Tenengrad check, figure script.
+- `05_reproducibility_archive`: anonymised split assignments, selected checkpoint and threshold per classifier, per-run table of all test searches, per-field baseline outcomes, `make_archive.py`.
+- `results`: the small result files used in the manuscript tables. `docs/STEP_CONVENTION_R1-1.md`: step convention and re-run order.
 
 ## Run order
-1. `cd 01_data_preparation && python data_preparation.py`
-   Labels images (Focused > 0.55, Medium 0.30–0.55, Blur <= 0.30 of the per-FOV Brenner maximum),
-   removes the 10 excluded FOV, splits by FOV (70/15/15, random_state=42) and builds the balanced set.
-2. `cd 02_backbone_training && python run_all.py`
-   Trains the 14 networks of the common script (AdamW, lr 1e-4, batch 64, 50 epochs, patience 10).
-   YOLO26n-cls is trained with Ultralytics (arguments in `02_backbone_training/yolo26n_args.yaml`):
-       yolo classify train model=yolo26n-cls.pt data=<dataset_balanced> epochs=50 patience=10 batch=64 imgsz=224 seed=0 name=yolo26n_balanced
-   Optional: `python test_leftover_blur.py --model resnet18_balanced` (generalisation check on unused Blur images).
-3. `cd 03_pipeline_validation`
-       python prepare_simulation_data.py        # full focus stacks of the 71 test FOV
-       python prepare_val_simulation_data.py    # full focus stacks of the 63 validation FOV
-       python cnn_inference_cache.py            # predictions of all 15 models on test FOV
-       python cnn_inference_cache_val.py        # ... on validation FOV
-       python select_on_val.py                  # selects p_min and classifier on validation, reports test once
-       python rerun_unitfix.py                  # unit-consistent replay, baselines, paired statistics
-       python sensitivity_p_min.py              # p_min sweep (Fig. Pareto)
-       python retained_sharpness.py             # sharpness retained at the stopping position
-4. `cd 04_analysis && python tenengrad_check.py --fov ... --retained ...` (independent focus measure).
+1. `01_data_preparation/data_preparation.py`: labels images (Focused P > 0.55, Medium 0.30 < P <= 0.55, Blur otherwise, P = Brenner score / per-FOV maximum; boundaries fixed a priori), removes the 10 excluded FOV, splits by FOV (70/15/15, seed 42, stratified by capture session) and builds the class-balanced set (seed 42).
+2. `02_backbone_training/run_all.py`: trains the 14 networks (AdamW, learning rate 1e-4, batch size 64, weight decay 0.01, ReduceLROnPlateau factor 0.5 patience 5, up to 50 epochs, early stopping patience 10, class-weighted cross-entropy; checkpoint = epoch with the lowest validation loss). YOLO26n-cls is trained with Ultralytics, arguments in `yolo26n_args.yaml` (seed 0, default loss, no class weights, best.pt). Optional: `test_leftover_blur.py`.
+3. `03_pipeline_validation`: `prepare_simulation_data.py`, `prepare_val_simulation_data.py`, `prepare_train_simulation_data.py`, then `cnn_inference_cache.py`, `cnn_inference_cache_val.py`, `cnn_inference_cache_train.py`, then `select_on_val.py` (p_min and classifier chosen on validation, test evaluated once), `rerun_unitfix.py` (replay, baselines, paired statistics), `sensitivity_p_min.py`, `retained_sharpness.py`, `nonlearning_stop.py`, `report_train_replay.py`.
+4. `04_supporting_analysis`: `paired_ci.py <output_dir>`, `spearman_perm.py`, `trigger_labels.py`, `unimodality_check.py`, `tenengrad_check.py`, `make_figs_steps.py`.
+5. `05_reproducibility_archive/make_archive.py`: writes the archive tables and checks by assertion that the per-run log reproduces the official replay (1,065 classifier runs on 71 FOV).
 
-## Results included
-`results/` holds the small result files used in the paper (comparison table, selection and
-sharpness outputs, YOLO26n-cls training log). Image data, model checkpoints and prediction caches are not included.
+## Conventions
+- A step is one position to which the stage is moved and at which an image is captured. The midpoint returned after interval termination counts as one further step. Every new requested angle is charged, even if it maps to an already used recorded angle. A strategy returns the sampled (nearest recorded) angle. The final repositioning move of the full sweep, hill climbing and coarse-to-fine is not charged.
+- Success: |returned angle - Brenner maximum| <= 1.0 degree (0.5 and 2.0 as sensitivity). Servo counts of the 93FOV session are converted with 300/1023 degrees per count.
+- Time: estimated as steps x 0.65 s (programmed step interval of the acquisition software: command, 400 ms settling, capture and save). Median save-to-save intervals of recorded 0.5 degree moves were 0.66 s (two sessions) and 1.13 s (one session). End-to-end controller time was not measured. Measured GPU forward-pass latency (batch 1): FocusNet-Nano 0.79 ms, ViT-Tiny 3.51 ms, DenseNet-121 14.54 ms.
+- Random seeds: 42 for class balancing and the FOV split; 0 for YOLO26n-cls; fixed seeds for the bootstrap and permutation tests. Training of the 14 networks sets no global seed.
 
-## Notes
-- Network training of the 14 networks does not set a global random seed; only the class balancing and the FOV split use `random_state=42`.
-- Positions of the 93FOV session are logged in servo counts and converted with 300/1023 degrees per count.
+## Not included
+Images, model checkpoints, prediction caches, slide or specimen identifiers (not recorded), the link between anonymised and original field identifiers (`field_key_map_PRIVATE.csv`, excluded by `.gitignore`), and live-instrument measurements. Trained weights are not part of this release.
